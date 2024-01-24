@@ -1,5 +1,3 @@
-
-```markdown
 # redshift_tools
 
 `redshift_tools` es una librería Python diseñada para facilitar la interacción con Amazon Redshift, permitiendo a los usuarios de Python realizar operaciones comunes como consultar datos, cargar datos desde y hacia S3, ejecutar procedimientos almacenados, y manejar tablas dentro de Redshift de una manera sencilla y eficiente.
@@ -51,9 +49,6 @@ from redshift_tools import load_s3_to_redshift
 load_s3_to_redshift('mi_tabla', 's3://mi-bucket-s3/mi-archivo.csv', cluster_identifier='mi-cluster', database='mi-database', db_user='mi-usuario')
 ```
 
-## Contribuir
-
-Si estás interesado en contribuir a `redshift_tools`, por favor lee `CONTRIBUTING.md` para más información sobre cómo empezar.
 
 ## Licencia
 
@@ -62,5 +57,4 @@ Este proyecto está licenciado bajo la Licencia MIT - vea el archivo `LICENSE.md
 ## Soporte
 
 Si encuentras un problema o tienes una pregunta, por favor abre un issue en el [repositorio de GitHub](#).
-```
 
