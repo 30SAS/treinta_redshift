@@ -7,5 +7,6 @@ from .core import (
     execute_SP,
     truncate_table,
     drop_table,
-    sql_query
+    sql_query,
+    dataframe_to_redshift
 )
