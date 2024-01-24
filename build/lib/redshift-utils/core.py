@@ -368,3 +368,8 @@ def sql_query(sql_query, database = "landing_zone",cluster_identifier = 'redshif
         print("La operación fue abortada o no se completó exitosamente.")
 
         return 0
+
+def dataframe_to_redshift(df,table,schema,bucket,database='landing_zone',endpoint = 'data_lake',object_name = False,db_user ='admintreinta', cluster_identifier = 'redshift-data'):
+    s3_object_path = dataframe_to_s3(df, bucket, endpoint, object_name)
+    output = load_s3_to_redshift(table,schema, s3_object_path, cluster_identifier, database, db_user)
+    return output
