@@ -1,6 +1,6 @@
-# redshift_tools
+# treinta_redshift
 
-`redshift_tools` es una librería Python diseñada para facilitar la interacción con Amazon Redshift, permitiendo a los usuarios de Python realizar operaciones comunes como consultar datos, cargar datos desde y hacia S3, ejecutar procedimientos almacenados, y manejar tablas dentro de Redshift de una manera sencilla y eficiente.
+`treinta_redshift` es una librería Python diseñada para facilitar la interacción con Amazon Redshift, permitiendo a los usuarios de Python realizar operaciones comunes como consultar datos, cargar datos desde y hacia S3, ejecutar procedimientos almacenados, y manejar tablas dentro de Redshift de una manera sencilla y eficiente.
 
 ## Características
 
@@ -12,10 +12,10 @@
 
 ## Instalación
 
-Puedes instalar `redshift_tools` utilizando pip:
+Puedes instalar `treinta_redshift` utilizando pip:
 
 ```bash
-pip install redshift_tools
+pip install treinta_redshift
 ```
 
 ## Uso
@@ -23,7 +23,7 @@ pip install redshift_tools
 ### Consultar Datos de Redshift
 
 ```python
-from redshift_tools import query_to_dataframe
+from treinta-redshift import query_to_dataframe
 
 sql_query = "SELECT * FROM mi_esquema.mi_tabla LIMIT 10;"
 df = query_to_dataframe(sql_query, cluster_identifier='mi-cluster', database='mi-database', db_user='mi-usuario')
@@ -33,7 +33,7 @@ print(df)
 ### Cargar Datos a S3
 
 ```python
-from redshift_tools import dataframe_to_s3
+from treinta-redshift import dataframe_to_s3
 import pandas as pd
 
 df = pd.DataFrame({'col1': [1, 2], 'col2': ['A', 'B']})
@@ -44,7 +44,7 @@ print(f"Datos cargados a {s3_path}")
 ### Cargar Datos desde S3 a Redshift
 
 ```python
-from redshift_tools import load_s3_to_redshift
+from treinta-redshift import load_s3_to_redshift
 
 load_s3_to_redshift('mi_tabla', 's3://mi-bucket-s3/mi-archivo.csv', cluster_identifier='mi-cluster', database='mi-database', db_user='mi-usuario')
 ```
