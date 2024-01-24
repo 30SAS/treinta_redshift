@@ -1,0 +1,10 @@
+LICENSE
+README.md
+setup.py
+treinta_redshift/__init__.py
+treinta_redshift/core.py
+treinta_redshift.egg-info/PKG-INFO
+treinta_redshift.egg-info/SOURCES.txt
+treinta_redshift.egg-info/dependency_links.txt
+treinta_redshift.egg-info/requires.txt
+treinta_redshift.egg-info/top_level.txt
