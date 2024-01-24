@@ -6,7 +6,7 @@ def read_requirements():
         return req.read().splitlines()
 
 setup(
-    name='treinta-redshift',
+    name='treinta_redshift',
     version='0.1.0',
     author='cristian.pinela',
     author_email='cristian.pinela@treinta.co',
