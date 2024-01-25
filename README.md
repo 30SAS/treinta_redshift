@@ -26,7 +26,7 @@ pip install treinta_redshift
 from treinta_redshift import query_to_dataframe
 
 sql_query = "SELECT * FROM mi_esquema.mi_tabla LIMIT 10;"
-df = query_to_dataframe(sql_query, cluster_identifier='mi-cluster', database='mi-database', db_user='mi-usuario')
+df = query_to_dataframe(sql_query, cluster_identifier='micluster', database='midatabase', db_user='miusuario')
 print(df)
 ```
 
