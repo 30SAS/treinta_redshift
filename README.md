@@ -23,7 +23,7 @@ pip install treinta_redshift
 ### Consultar Datos de Redshift
 
 ```python
-from treinta-redshift import query_to_dataframe
+from treinta_redshift import query_to_dataframe
 
 sql_query = "SELECT * FROM mi_esquema.mi_tabla LIMIT 10;"
 df = query_to_dataframe(sql_query, cluster_identifier='mi-cluster', database='mi-database', db_user='mi-usuario')
@@ -33,7 +33,7 @@ print(df)
 ### Cargar Datos a S3
 
 ```python
-from treinta-redshift import dataframe_to_s3
+from treinta_redshift import dataframe_to_s3
 import pandas as pd
 
 df = pd.DataFrame({'col1': [1, 2], 'col2': ['A', 'B']})
@@ -44,7 +44,7 @@ print(f"Datos cargados a {s3_path}")
 ### Cargar Datos desde S3 a Redshift
 
 ```python
-from treinta-redshift import load_s3_to_redshift
+from treinta_redshift import load_s3_to_redshift
 
 load_s3_to_redshift('mi_tabla', 's3://mi-bucket-s3/mi-archivo.csv', cluster_identifier='mi-cluster', database='mi-database', db_user='mi-usuario')
 ```
