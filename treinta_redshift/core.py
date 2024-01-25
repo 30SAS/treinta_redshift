@@ -25,9 +25,9 @@ def table_to_dataframe(table,schema,database='landing_zone', NUM_ENTRIES = 0, cl
     - Un DataFrame de pandas con los resultados de la consulta.
     """
     client = boto3.client('redshift-data')
-    sql_query = f"SELECT * FROM {database}.{schema}.{table}"
+    sql_query = f"SELECT * FROM {database}.{schema}.{table} "
     if NUM_ENTRIES != 0:
-        sql_query = sql_query + f"LIMIT {NUM_ENTRIES}"
+        sql_query = sql_query + f"LIMIT {str(NUM_ENTRIES)}"
         
     response = client.execute_statement(
         ClusterIdentifier=cluster_identifier,
