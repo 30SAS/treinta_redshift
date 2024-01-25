@@ -120,7 +120,7 @@ def query_to_dataframe(sql_query, cluster_identifier = 'redshift-data', database
         print("La operación fue abortada o no se completó exitosamente.")
         return pd.DataFrame()  # Retorna un DataFrame vacío si la consulta falla
 
-def dataframe_to_s3(df, bucket="redshift_python_datalake", endpoint='data_lake', object_name=''):
+def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake', object_name=''):
     # Generar un sello de tiempo con el formato deseado
     timestamp = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S_%f')
     year = datetime.datetime.now().strftime('%Y')
@@ -369,7 +369,7 @@ def sql_query(sql_query, database = "landing_zone",cluster_identifier = 'redshif
 
         return 0
 
-def dataframe_to_redshift(df,table,schema,bucket = "redshift_python_datalake" ,database='landing_zone',endpoint = 'data_lake',object_name = False,db_user ='admintreinta', cluster_identifier = 'redshift-data'):
+def dataframe_to_redshift(df,table,schema,bucket = "redshift-python-datalake" ,database='landing_zone',endpoint = 'data_lake',object_name = False,db_user ='admintreinta', cluster_identifier = 'redshift-data'):
     s3_object_path = dataframe_to_s3(df, bucket, endpoint, object_name)
     output = load_s3_to_redshift(table,schema, s3_object_path, database, cluster_identifier, db_user)
     return output
