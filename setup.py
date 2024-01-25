@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 
-# Función para leer el contenido de requirements.txt
 setup(
     name='treinta_redshift',
     version='0.1.0',
@@ -10,6 +9,7 @@ setup(
     license='LICENSE',
     description='Libreria para data engineering',
     long_description='Librería que permite programar sobre redshift utilizando python para tareas de data engineering',
+    long_description_content_type='text/markdown',  # Specify Markdown format
     install_requires=[
         'boto3==1.34.23',
         'botocore==1.34.23',
