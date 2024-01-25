@@ -1,5 +1,3 @@
-Para crear un `README.md` más extenso y detallado, que resalte las ventajas de tu librería y proporcione toda la información necesaria sobre las políticas de IAM requeridas, aquí tienes una versión ampliada y mejorada:
-
 ```markdown
 # Treinta Redshift
 
@@ -162,5 +160,3 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para má
 Para soporte, preguntas o colaboraciones, por favor, abre un issue en el [repositorio de GitHub](#) para que podamos seguir la conversación.
 
 ```
-
-Este `README.md` proporciona una introducción completa a la librería, destacando sus beneficios y proporcionando toda la información necesaria para que los usuarios la instalen, configuren y comiencen a usarla eficazmente.

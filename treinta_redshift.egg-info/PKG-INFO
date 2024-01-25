@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
 Name: treinta_redshift
-Version: 0.1.5
-Summary: Libreria para data engineering
+Version: 1.0.0
+Summary: paquete que permite interactuar pandas con redshift
 Author: cristian.pinela
 Author-email: cristian.pinela@treinta.co
 License: LICENSE
@@ -12,8 +12,6 @@ Requires-Dist: botocore==1.34.23
 Requires-Dist: numpy==1.25.0
 Requires-Dist: pandas==2.0.2
 Requires-Dist: pyarrow==13.0.0
-
-Para crear un `README.md` más extenso y detallado, que resalte las ventajas de tu librería y proporcione toda la información necesaria sobre las políticas de IAM requeridas, aquí tienes una versión ampliada y mejorada:
 
 ```markdown
 # Treinta Redshift
@@ -177,5 +175,3 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para má
 Para soporte, preguntas o colaboraciones, por favor, abre un issue en el [repositorio de GitHub](#) para que podamos seguir la conversación.
 
 ```
-
-Este `README.md` proporciona una introducción completa a la librería, destacando sus beneficios y proporcionando toda la información necesaria para que los usuarios la instalen, configuren y comiencen a usarla eficazmente.
