@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='treinta_redshift',
-    version='0.1.1',
+    version='0.1.2',
     author='cristian.pinela',
     author_email='cristian.pinela@treinta.co',
     packages=find_packages(),
