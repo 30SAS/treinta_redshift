@@ -6,6 +6,7 @@ on:
       - main  # O la rama que utilices para tus lanzamientos
 jobs:
   build-n-publish:
+    permissions: write-all
     name: Build and publish to PyPI
     runs-on: ubuntu-latest
 
