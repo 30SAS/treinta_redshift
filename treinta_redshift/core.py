@@ -7,7 +7,7 @@ import datetime
 import uuid
 import pandas as pd
 
-def table_to_dataframe(table,schema,database='landing_zone', NUM_ENTRIES = 0, cluster_identifier = 'redshift-data', db_user = 'admintreinta'):
+def table_to_dataframe(table,schema,database='landing_zone', NUM_ENTRIES = 0, cluster_identifier = 'redshift-data', db_user = 'admintreinta', region_name='us-west-2'):
     """
     Ejecuta una consulta SQL en Amazon Redshift y devuelve los resultados como un DataFrame de pandas.
     
@@ -24,7 +24,7 @@ def table_to_dataframe(table,schema,database='landing_zone', NUM_ENTRIES = 0, cl
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data')
+    client = boto3.client('redshift-data', region_name=region_name)
     sql_query = f"SELECT * FROM {database}.{schema}.{table} "
     if NUM_ENTRIES != 0:
         sql_query = sql_query + f"LIMIT {str(NUM_ENTRIES)}"
@@ -67,7 +67,7 @@ def table_to_dataframe(table,schema,database='landing_zone', NUM_ENTRIES = 0, cl
         return pd.DataFrame()  # Retorna un DataFrame vacío si la consulta falla
 
 
-def query_to_dataframe(sql_query, cluster_identifier = 'redshift-data', database = "landing_zone", db_user = 'admintreinta'):
+def query_to_dataframe(sql_query, cluster_identifier = 'redshift-data', database = "landing_zone", db_user = 'admintreinta', region_name='us-west-2'):
     """
     Ejecuta una consulta SQL en Amazon Redshift y devuelve los resultados como un DataFrame de pandas.
     
@@ -81,7 +81,7 @@ def query_to_dataframe(sql_query, cluster_identifier = 'redshift-data', database
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data')
+    client = boto3.client('redshift-data', region_name=region_name)
     
     response = client.execute_statement(
         ClusterIdentifier=cluster_identifier,
@@ -144,8 +144,8 @@ def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake',
     
     return f's3://{bucket}/{object_path}'
 
-def load_s3_to_redshift(table,schema, s3_object_path, database='landing_zone', cluster_identifier='redshift-data', db_user='admintreinta'):
-    client = boto3.client('redshift-data')
+def load_s3_to_redshift(table,schema, s3_object_path, database='landing_zone', cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2'):
+    client = boto3.client('redshift-data', region_name=region_name)
     sql = f"""
         COPY {database}.{schema}.{table}
         FROM '{s3_object_path}'
@@ -188,7 +188,7 @@ def load_s3_to_redshift(table,schema, s3_object_path, database='landing_zone', c
         
     return response
 
-def execute_SP(store_procedure,schema,database = "landing_zone", cluster_identifier = 'redshift-data', db_user = 'admintreinta'):
+def execute_SP(store_procedure,schema,database = "landing_zone", cluster_identifier = 'redshift-data', db_user = 'admintreinta', region_name='us-west-2'):
     """
     Ejecuta una un store en Amazon Redshift
     
@@ -203,7 +203,7 @@ def execute_SP(store_procedure,schema,database = "landing_zone", cluster_identif
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data')
+    client = boto3.client('redshift-data', region_name=region_name)
     
     sql_query = f"CALL {database}.{schema}.{store_procedure}()"
     response = client.execute_statement(
@@ -232,7 +232,7 @@ def execute_SP(store_procedure,schema,database = "landing_zone", cluster_identif
         print("La operación fue abortada o no se completó exitosamente.")
         return 0
 
-def truncate_table(table, schema, database = "landing_zone", cluster_identifier = 'redshift-data', db_user = 'admintreinta'):
+def truncate_table(table, schema, database = "landing_zone", cluster_identifier = 'redshift-data', db_user = 'admintreinta', region_name='us-west-2'):
     """
     Ejecuta una un store en Amazon Redshift
     
@@ -248,7 +248,7 @@ def truncate_table(table, schema, database = "landing_zone", cluster_identifier 
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data')
+    client = boto3.client('redshift-data', region_name=region_name)
     
     sql_query = f"TRUNCATE {database}.{schema}.{table}"
     response = client.execute_statement(
@@ -278,7 +278,7 @@ def truncate_table(table, schema, database = "landing_zone", cluster_identifier 
         print("La operación fue abortada o no se completó exitosamente.")
     return 0
 
-def drop_table(table, schema, database = "landing_zone", cluster_identifier = 'redshift-data', db_user = 'admintreinta'):
+def drop_table(table, schema, database = "landing_zone", cluster_identifier = 'redshift-data', db_user = 'admintreinta', region_name='us-west-2'):
     """
     Ejecuta una un store en Amazon Redshift
     
@@ -295,7 +295,7 @@ def drop_table(table, schema, database = "landing_zone", cluster_identifier = 'r
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data')
+    client = boto3.client('redshift-data', region_name=region_name)
     
     sql_query = f"DROP TABLE {database}.{schema}.{table}"
     response = client.execute_statement(
@@ -325,7 +325,7 @@ def drop_table(table, schema, database = "landing_zone", cluster_identifier = 'r
         print("La operación fue abortada o no se completó exitosamente.")
         return 0
 
-def sql_query(sql_query, database = "landing_zone",cluster_identifier = 'redshift-data', db_user = 'admintreinta'):
+def sql_query(sql_query, database = "landing_zone",cluster_identifier = 'redshift-data', db_user = 'admintreinta', region_name='us-west-2'):
     """
     Ejecuta una un store en Amazon Redshift
     
@@ -339,7 +339,7 @@ def sql_query(sql_query, database = "landing_zone",cluster_identifier = 'redshif
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data')
+    client = boto3.client('redshift-data', region_name=region_name)
     
     response = client.execute_statement(
         ClusterIdentifier=cluster_identifier,
