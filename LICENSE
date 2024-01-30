@@ -1,21 +1,23 @@
-MIT License
+## `treinta_redshift` Software License
 
-Copyright (c) 2024 Treinta
+### Copyright (c) 2024 Treinta
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+All rights reserved.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This software and associated documentation files (the "Software") are the property of Treinta. The Software is licensed, not sold, and is available for use exclusively within Treinta. This is a proprietary license and is not open source.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+#### License Terms:
+
+1. **Internal Use Only**: The Software, `treinta_redshift`, is to be used solely within the organizational boundaries of Treinta. Any external use is strictly prohibited.
+
+2. **No Copying or Redistribution**: Copying, reproduction, redistribution, or reselling of the Software, in whole or in part, is expressly prohibited.
+
+3. **No Modification**: Modifying, merging, or creating derivative works based on the Software is not permitted.
+
+4. **No Sub-licensing**: The rights to sublicense or transfer the Software to any third party are not granted.
+
+5. **Disclaimer**: The Software is provided "as is" without any warranties, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
+
+6. **Liability**: In no event shall Treinta be liable for any claim, damages, or other liability, whether in an action of contract, tort or otherwise, arising from, out of, or in connection with the Software or the use or other dealings in the Software.
+
+This proprietary license restricts the use, copying, and distribution of the Software to internal operations of Treinta only, and ensures that the Software remains exclusively under the control of Treinta.
