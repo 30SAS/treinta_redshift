@@ -7,6 +7,11 @@ Author-email: cristian.pinela@treinta.co
 License: LICENSE
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: boto3
+Requires-Dist: botocore
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: pyarrow
 
 # treinta_redshift
 

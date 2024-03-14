@@ -5,29 +5,27 @@ import time
 from io import BytesIO
 import datetime
 import uuid
-import pandas as pd
+from pandas import DataFrame
 
-def table_to_dataframe(table,schema,database='landing_zone', NUM_ENTRIES = 0, cluster_identifier = 'redshift-data', db_user = 'admintreinta', region_name='us-west-2'):
+def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cluster_identifier='redshift-data', db_user='admintreinta'):
     """
-    Ejecuta una consulta SQL en Amazon Redshift y devuelve los resultados como un DataFrame de pandas.
+    Ejecuta una consulta SQL en Amazon Redshift para extraer datos de una tabla específica y devuelve los resultados como un DataFrame de pandas.
     
     Parámetros:
-    - table : Tabla a copiar en un dataframe
-    - schema: schema de la tabla a copiar en un datafrmae
-    - database: database de la tabla a copiar en un dataframe
-    - LIMIT: limitar entries
-    - cluster_identifier: Identificador del cluster de Amazon Redshift.
-    - database: Nombre de la base de datos.
-    - db_user: Usuario de la base de datos.
-    
+    - table : Nombre de la tabla a consultar.
+    - schema: Esquema de la base de datos donde se encuentra la tabla.
+    - database: Nombre de la base de datos donde se encuentra la tabla.
+    - NUM_ENTRIES: Número máximo de entradas a retornar. Si es 0, retorna todas las entradas.
+    - cluster_identifier: Identificador del clúster de Amazon Redshift.
+    - db_user: Usuario de la base de datos para ejecutar la consulta.
     
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data', region_name=region_name)
-    sql_query = f"SELECT * FROM {database}.{schema}.{table} "
-    if NUM_ENTRIES != 0:
-        sql_query = sql_query + f"LIMIT {str(NUM_ENTRIES)}"
+    client = boto3.client('redshift-data')
+    sql_query = f"SELECT * FROM {schema}.{table} "
+    if NUM_ENTRIES > 0:
+        sql_query += f"LIMIT {NUM_ENTRIES}"
         
     response = client.execute_statement(
         ClusterIdentifier=cluster_identifier,
@@ -47,27 +45,44 @@ def table_to_dataframe(table,schema,database='landing_zone', NUM_ENTRIES = 0, cl
         print(f"Current status: {status}")
     
     if status == 'FINISHED':
-        response1 = client.get_statement_result(Id=statement_id)
+        response = client.get_statement_result(Id=statement_id)
         
         # Extrayendo los nombres de las columnas de la metadata de columnas
-        column_metadata = response1['ColumnMetadata']
+        column_metadata = response['ColumnMetadata']
         column_names = [column['name'] for column in column_metadata]
         
         # Construyendo el DataFrame
-        df = pd.DataFrame([[field.get('stringValue', '') for field in record] for record in response1['Records']], columns=column_names)
+        records = response['Records']
+        df_rows = []
+        for record in records:
+            row = []
+            for field in record:
+                if 'isNull' in field and field['isNull']:
+                    row.append(None)
+                elif 'stringValue' in field:
+                    row.append(field['stringValue'])
+                elif 'longValue' in field:
+                    row.append(field['longValue'])
+                else:
+                    row.append(None)  # Añadir soporte para más tipos según sea necesario
+            df_rows.append(row)
+        
+        df = DataFrame(df_rows, columns=column_names)
         
         return df
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
         error_message = status_response.get('Error', 'No se proporcionó información de error.')
         print(f"Error: {error_message}")
-        return pd.DataFrame()  # Retorna un DataFrame vacío si la consulta falla
+        return DataFrame()  # Retorna un DataFrame vacío si la consulta falla
     else:
         print("La operación fue abortada o no se completó exitosamente.")
-        return pd.DataFrame()  # Retorna un DataFrame vacío si la consulta falla
+        return DataFrame()  # Retorna un DataFrame vacío si la consulta falla
 
 
-def query_to_dataframe(sql_query, cluster_identifier = 'redshift-data', database = "landing_zone", db_user = 'admintreinta', region_name='us-west-2'):
+
+
+def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="landing_zone", db_user='admintreinta'):
     """
     Ejecuta una consulta SQL en Amazon Redshift y devuelve los resultados como un DataFrame de pandas.
     
@@ -77,11 +92,10 @@ def query_to_dataframe(sql_query, cluster_identifier = 'redshift-data', database
     - database: Nombre de la base de datos.
     - db_user: Usuario de la base de datos.
     
-    
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data', region_name=region_name)
+    client = boto3.client('redshift-data')
     
     response = client.execute_statement(
         ClusterIdentifier=cluster_identifier,
@@ -108,17 +122,22 @@ def query_to_dataframe(sql_query, cluster_identifier = 'redshift-data', database
         column_names = [column['name'] for column in column_metadata]
         
         # Construyendo el DataFrame
-        df = pd.DataFrame([[field.get('stringValue', '') for field in record] for record in response1['Records']], columns=column_names)
+        df = DataFrame([[
+            field.get('stringValue') if 'stringValue' in field else
+            field.get('longValue') if 'longValue' in field else
+            None for field in record] for record in response1['Records']],
+            columns=column_names)
         
         return df
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
         error_message = status_response.get('Error', 'No se proporcionó información de error.')
         print(f"Error: {error_message}")
-        return pd.DataFrame()  # Retorna un DataFrame vacío si la consulta falla
+        return DataFrame()  # Retorna un DataFrame vacío si la consulta falla
     else:
         print("La operación fue abortada o no se completó exitosamente.")
-        return pd.DataFrame()  # Retorna un DataFrame vacío si la consulta falla
+        return DataFrame()  # Retorna un DataFrame vacío si la consulta falla
+
 
 def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake', object_name=''):
     # Generar un sello de tiempo con el formato deseado
