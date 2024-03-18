@@ -7,7 +7,7 @@ import datetime
 import uuid
 from pandas import DataFrame
 
-def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cluster_identifier='redshift-data', db_user='admintreinta'):
+def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cluster_identifier='redshift-data', region_name='us-west-2', db_user='admintreinta'):
     """
     Ejecuta una consulta SQL en Amazon Redshift para extraer datos de una tabla específica y devuelve los resultados como un DataFrame de pandas.
     
@@ -22,7 +22,7 @@ def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cl
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data')
+    client = boto3.client('redshift-data', region_name=region_name)
     sql_query = f"SELECT * FROM {schema}.{table} "
     if NUM_ENTRIES > 0:
         sql_query += f"LIMIT {NUM_ENTRIES}"
@@ -84,7 +84,7 @@ def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cl
 
 
 
-def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="landing_zone", db_user='admintreinta'):
+def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="landing_zone", region_name='us-west-2', db_user='admintreinta'):
     """
     Ejecuta una consulta SQL en Amazon Redshift y devuelve los resultados como un DataFrame de pandas.
     
@@ -97,7 +97,7 @@ def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data')
+    client = boto3.client('redshift-data', region_name=region_name)
     
     response = client.execute_statement(
         ClusterIdentifier=cluster_identifier,
@@ -142,7 +142,7 @@ def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="
         return DataFrame()  # Retorna un DataFrame vacío si la consulta falla
 
 
-def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake', object_name=''):
+def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake', region_name='us-west-2', object_name=''):
     # Generar un sello de tiempo con el formato deseado
     timestamp = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S_%f')
     year = datetime.datetime.now().strftime('%Y')
@@ -161,7 +161,7 @@ def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake',
     # Es necesario mover el puntero del buffer al inicio después de escribir en él
     csv_buffer.seek(0)
 
-    s3_resource = boto3.resource('s3')
+    s3_resource = boto3.resource('s3', region_name=region_name)
     s3_resource.Object(bucket, object_path).put(Body=csv_buffer.getvalue())
     
     return f's3://{bucket}/{object_path}'
@@ -391,7 +391,7 @@ def sql_query(sql_query, database = "landing_zone",cluster_identifier = 'redshif
 
         return 0
 
-def dataframe_to_redshift(df,table,schema,bucket = "redshift-python-datalake" ,database='landing_zone',endpoint = 'data_lake',object_name = False,db_user ='admintreinta', cluster_identifier = 'redshift-data'):
-    s3_object_path = dataframe_to_s3(df, bucket, endpoint, object_name)
-    output = load_s3_to_redshift(table,schema, s3_object_path, database, cluster_identifier, db_user)
+def dataframe_to_redshift(df,table,schema,bucket = "redshift-python-datalake" ,database='landing_zone', region_name='us-west-2',endpoint = 'data_lake',object_name = False,db_user ='admintreinta', cluster_identifier = 'redshift-data'):
+    s3_object_path = dataframe_to_s3(df, bucket, endpoint, object_name, region_name=region_name)
+    output = load_s3_to_redshift(table,schema, s3_object_path, database, cluster_identifier, db_user, region_name=region_name)
     return output
