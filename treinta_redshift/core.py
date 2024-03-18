@@ -391,7 +391,8 @@ def sql_query(sql_query, database = "landing_zone",cluster_identifier = 'redshif
 
         return 0
 
-def dataframe_to_redshift(df,table,schema,bucket = "redshift-python-datalake" ,database='landing_zone', region_name='us-west-2',endpoint = 'data_lake',object_name = False,db_user ='admintreinta', cluster_identifier = 'redshift-data'):
-    s3_object_path = dataframe_to_s3(df, bucket, endpoint, object_name, region_name=region_name)
-    output = load_s3_to_redshift(table,schema, s3_object_path, database, cluster_identifier, db_user, region_name=region_name)
+def dataframe_to_redshift(df, table, schema, bucket="redshift-python-datalake", database='landing_zone', region_name='us-west-2', endpoint='data_lake', object_name=None, db_user='admintreinta', cluster_identifier='redshift-data'):
+    # Asegúrate de que todos los argumentos se pasen por nombre
+    s3_object_path = dataframe_to_s3(df=df, bucket=bucket, endpoint=endpoint, region_name=region_name, object_name=object_name)
+    output = load_s3_to_redshift(table=table, schema=schema, s3_object_path=s3_object_path, database=database, cluster_identifier=cluster_identifier, db_user=db_user, region_name=region_name)
     return output
