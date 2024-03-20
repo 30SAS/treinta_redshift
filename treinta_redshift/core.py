@@ -65,6 +65,8 @@ def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cl
                     row.append(field['longValue'])
                 elif 'doubleValue' in field:
                     row.append(field['doubleValue'])
+                elif 'booleanValue' in field:
+                    row.append(field['booleanValue'])
                 else:
                     row.append(None)  # Añadir soporte para más tipos según sea necesario
             df_rows.append(row)
@@ -128,6 +130,7 @@ def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="
             field.get('stringValue') if 'stringValue' in field else
             field.get('longValue') if 'longValue' in field else
             field.get('doubleValue') if 'doubleValue' in field else
+            field.get('booleanValue') if 'booleanValue' in field else
             None for field in record] for record in response1['Records']],
             columns=column_names)
         
