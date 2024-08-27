@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: treinta_redshift
-Version: 1.4
+Version: 1.5
 Summary: paquete que permite interactuar pandas con redshift
 Author: cristian.pinela
 Author-email: cristian.pinela@treinta.co
