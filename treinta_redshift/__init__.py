@@ -8,5 +8,6 @@ from .core import (
     truncate_table,
     drop_table,
     sql_query,
-    dataframe_to_redshift
+    dataframe_to_redshift,
+    assume_role  
 )
