@@ -7,8 +7,29 @@ import datetime
 import uuid
 from pandas import DataFrame
 
+def assume_role(role_arn, session_name="RedshiftAccessSession"):
+    """
+    Asume un rol en otra cuenta de AWS y obtiene credenciales temporales.
+    
+    Parámetros:
+    - role_arn: El ARN del rol a asumir.
+    - session_name: Nombre de la sesión para las credenciales temporales.
+    
+    Retorna:
+    - Un diccionario con las credenciales temporales (AccessKeyId, SecretAccessKey, SessionToken).
+    """
+    try:
+        sts_client = boto3.client('sts')
+        assumed_role = sts_client.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName=session_name
+        )
+        return assumed_role['Credentials']
+    except Exception as e:
+        print(f"Error al asumir el rol: {e}")
+        return None
 
-def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cluster_identifier='redshift-data', region_name='us-west-2', db_user='admintreinta'):
+def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cluster_identifier='redshift-data', region_name='us-west-2', db_user='admintreinta', credentials= None):
     """
     Ejecuta una consulta SQL en Amazon Redshift para extraer datos de una tabla específica y devuelve los resultados como un DataFrame de pandas.
 
@@ -23,7 +44,18 @@ def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cl
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data', region_name=region_name)
+    if credentials:
+        client = boto3.client(
+        'redshift-data',
+        region_name=region_name,
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken']
+    )
+        
+    else:
+        client = boto3.client('redshift-data', region_name=region_name)
+        
     sql_query = f"SELECT * FROM {schema}.{table} "
     if NUM_ENTRIES > 0:
         sql_query += f"LIMIT {NUM_ENTRIES}"
@@ -88,7 +120,7 @@ def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cl
         return DataFrame(), status  # Retorna un DataFrame vacío si la consulta falla
 
 
-def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="landing_zone", region_name='us-west-2', db_user='admintreinta'):
+def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="landing_zone", region_name='us-west-2', db_user='admintreinta', credentials= None):
     """
     Ejecuta una consulta SQL en Amazon Redshift y devuelve los resultados como un DataFrame de pandas.
 
@@ -101,7 +133,17 @@ def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data', region_name=region_name)
+    if credentials:
+        client = boto3.client(
+        'redshift-data',
+        region_name=region_name,
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken']
+    )
+        
+    else:
+        client = boto3.client('redshift-data', region_name=region_name)
 
     response = client.execute_statement(
         ClusterIdentifier=cluster_identifier,
@@ -149,7 +191,7 @@ def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="
         return DataFrame(), status  # Retorna un DataFrame vacío si la consulta falla
 
 
-def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake', region_name='us-west-2', object_name=''):
+def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake', region_name='us-west-2', object_name='', credentials= None):
     # Generar un sello de tiempo con el formato deseado
     timestamp = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S_%f')
     year = datetime.datetime.now().strftime('%Y')
@@ -168,14 +210,36 @@ def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake',
     # Es necesario mover el puntero del buffer al inicio después de escribir en él
     csv_buffer.seek(0)
 
-    s3_resource = boto3.resource('s3', region_name=region_name)
+    if credentials:
+        s3_resource = boto3.resource(
+            's3',
+            region_name=region_name,
+            aws_access_key_id=credentials['AccessKeyId'],
+            aws_secret_access_key=credentials['SecretAccessKey'],
+            aws_session_token=credentials['SessionToken']
+        )
+    else:
+        s3_resource = boto3.resource('s3', region_name=region_name)
+        
     s3_resource.Object(bucket, object_path).put(Body=csv_buffer.getvalue())
 
     return f's3://{bucket}/{object_path}'
 
 
-def load_s3_to_redshift(table, schema, s3_object_path, database='landing_zone', cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2'):
-    client = boto3.client('redshift-data', region_name=region_name)
+def load_s3_to_redshift(table, schema, s3_object_path, database='landing_zone', cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2', credentials= None):
+    
+    if credentials:
+        client = boto3.client(
+        'redshift-data',
+        region_name=region_name,
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken']
+    )
+        
+    else:
+        client = boto3.client('redshift-data', region_name=region_name)
+        
     sql = f"""
         COPY {database}.{schema}.{table}
         FROM '{s3_object_path}'
@@ -219,7 +283,7 @@ def load_s3_to_redshift(table, schema, s3_object_path, database='landing_zone', 
     return status
 
 
-def execute_SP(store_procedure, schema, database="landing_zone", cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2'):
+def execute_SP(store_procedure, schema, database="landing_zone", cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2', credentials= None):
     """
     Ejecuta una un store en Amazon Redshift
 
@@ -234,7 +298,18 @@ def execute_SP(store_procedure, schema, database="landing_zone", cluster_identif
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data', region_name=region_name)
+    
+    if credentials:
+        client = boto3.client(
+        'redshift-data',
+        region_name=region_name,
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken']
+    )
+        
+    else:
+        client = boto3.client('redshift-data', region_name=region_name)
 
     sql_query = f"CALL {database}.{schema}.{store_procedure}()"
     response = client.execute_statement(
@@ -267,7 +342,7 @@ def execute_SP(store_procedure, schema, database="landing_zone", cluster_identif
     return status
 
 
-def truncate_table(table, schema, database="landing_zone", cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2'):
+def truncate_table(table, schema, database="landing_zone", cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2', credentials= None):
     """
     Ejecuta una un store en Amazon Redshift
 
@@ -283,7 +358,17 @@ def truncate_table(table, schema, database="landing_zone", cluster_identifier='r
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data', region_name=region_name)
+    if credentials:
+        client = boto3.client(
+        'redshift-data',
+        region_name=region_name,
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken']
+    )
+        
+    else:
+        client = boto3.client('redshift-data', region_name=region_name)
 
     sql_query = f"TRUNCATE {database}.{schema}.{table}"
     response = client.execute_statement(
@@ -316,7 +401,7 @@ def truncate_table(table, schema, database="landing_zone", cluster_identifier='r
 
     return status
 
-def drop_table(table, schema, database="landing_zone", cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2'):
+def drop_table(table, schema, database="landing_zone", cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2', credentials= None):
     """
     Ejecuta una un store en Amazon Redshift
 
@@ -333,7 +418,17 @@ def drop_table(table, schema, database="landing_zone", cluster_identifier='redsh
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data', region_name=region_name)
+    if credentials:
+        client = boto3.client(
+        'redshift-data',
+        region_name=region_name,
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken']
+    )
+        
+    else:
+        client = boto3.client('redshift-data', region_name=region_name)
 
     sql_query = f"DROP TABLE {database}.{schema}.{table}"
     response = client.execute_statement(
@@ -366,7 +461,7 @@ def drop_table(table, schema, database="landing_zone", cluster_identifier='redsh
 
     return status
 
-def sql_query(sql_query, database="landing_zone", cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2'):
+def sql_query(sql_query, database="landing_zone", cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2', credentials= None):
     """
     Ejecuta una un store en Amazon Redshift
 
@@ -380,7 +475,17 @@ def sql_query(sql_query, database="landing_zone", cluster_identifier='redshift-d
     Retorna:
     - Un DataFrame de pandas con los resultados de la consulta.
     """
-    client = boto3.client('redshift-data', region_name=region_name)
+    if credentials:
+        client = boto3.client(
+        'redshift-data',
+        region_name=region_name,
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken']
+    )
+        
+    else:
+        client = boto3.client('redshift-data', region_name=region_name)
 
     response = client.execute_statement(
         ClusterIdentifier=cluster_identifier,
@@ -413,10 +518,10 @@ def sql_query(sql_query, database="landing_zone", cluster_identifier='redshift-d
     return status
 
 
-def dataframe_to_redshift(df, table, schema, bucket="redshift-python-datalake", database='landing_zone', region_name='us-west-2', endpoint='data_lake', object_name=None, db_user='admintreinta', cluster_identifier='redshift-data'):
+def dataframe_to_redshift(df, table, schema, bucket="redshift-python-datalake", database='landing_zone', region_name='us-west-2', endpoint='data_lake', object_name=None, db_user='admintreinta', cluster_identifier='redshift-data', credentials= None):
     # Asegúrate de que todos los argumentos se pasen por nombre
     s3_object_path = dataframe_to_s3(
-        df=df, bucket=bucket, endpoint=endpoint, region_name=region_name, object_name=object_name)
+        df=df, bucket=bucket, endpoint=endpoint, region_name=region_name, object_name=object_name,credentials = credentials)
     output = load_s3_to_redshift(table=table, schema=schema, s3_object_path=s3_object_path, database=database,
-                                 cluster_identifier=cluster_identifier, db_user=db_user, region_name=region_name)
+                                 cluster_identifier=cluster_identifier, db_user=db_user, region_name=region_name, credentials = credentials)
     return output
