@@ -19,6 +19,7 @@
   - [7. `drop_table`](#7-drop_table)
   - [8. `dataframe_to_s3`](#8-dataframe_to_s3)
   - [9. `load_s3_to_redshift`](#9-load_s3_to_redshift)
+  - [10. `assume_role`](#10-assume_role)
 - [Carga de Datos a Redshift](#carga-de-datos-a-redshift)
   - [Uso de Amazon S3 como Data Lake](#uso-de-amazon-s3-como-data-lake)
   - [Optimización con la Instrucción COPY de Redshift](#optimización-con-la-instrucción-copy-de-redshift)
@@ -368,6 +369,44 @@ s3_object_path = 's3://mi-bucket-de-datos/datos-ejemplo/data.csv.gz'
 load_s3_to_redshift(table='ventas', schema='public', s3_object_path=s3_object_path, database='sales_data')
 ```
 En este ejemplo, se carga un archivo CSV comprimido desde el path `s3://mi-bucket-de-datos/datos-ejemplo/data.csv.gz` en S3 a la tabla `ventas` en el esquema `public` de la base de datos `sales_data` en Redshift. Este proceso es crucial para mantener actualizados los datos en Redshift con los archivos almacenados en S3.
+
+
+### 10. `assume_role`
+
+La función `assume_role` te permite asumir un rol de AWS en otra cuenta para obtener credenciales temporales. Esto es útil cuando necesitas interactuar con recursos en cuentas de AWS distintas a la tuya.
+
+**Parámetros**:
+- **role_arn (str)**:  
+  El ARN del rol que deseas asumir en la cuenta de destino. Este ARN debe tener la política adecuada para permitir que tu cuenta lo asuma.
+  
+- **session_name (str, opcional)**:  
+  Nombre de la sesión de STS. Por defecto, se usa "CrossAccountSession". Este nombre se utiliza para identificar las credenciales temporales generadas.
+
+**Retorna**:
+- Un diccionario con las credenciales temporales que contiene las siguientes claves:
+  - **AccessKeyId**: La clave de acceso temporal.
+  - **SecretAccessKey**: La clave secreta temporal.
+  - **SessionToken**: El token de sesión necesario para autenticar la solicitud.
+
+**Ejemplo de Uso**:
+
+```python
+from treinta_redshift import assume_role
+
+# Asume el rol en otra cuenta de AWS
+role_arn = "arn:aws:iam::123456789012:role/RoleName"
+credentials = assume_role(role_arn)
+
+# Usa las credenciales para hacer una operación en S3, Redshift, etc.
+print(credentials)
+```
+
+En este ejemplo, `assume_role` asume un rol en la cuenta con el ID `123456789012` y retorna las credenciales temporales necesarias para interactuar con los servicios de AWS en esa cuenta. Estas credenciales pueden ser usadas posteriormente en cualquier operación que requiera autenticación, como cargar datos en S3 o ejecutar consultas en Redshift.
+
+**Notas Importantes**:
+- Asegúrate de que el rol de IAM en la cuenta de destino tenga las políticas necesarias para permitir que tu cuenta lo asuma.
+- Las credenciales temporales obtenidas son válidas durante un período limitado (generalmente hasta 1 hora).
+
 
 ## Carga de Datos a Redshift
 
