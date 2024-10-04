@@ -109,6 +109,7 @@ def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cl
         df = DataFrame(df_rows, columns=column_names)
 
         return df, status
+    
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
         error_message = status_response.get(
@@ -182,13 +183,10 @@ def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="
         return df, status
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
-        error_message = status_response.get(
-            'Error', 'No se proporcionó información de error.')
-        print(f"Error: {error_message}")
-        return DataFrame(), status  # Retorna un DataFrame vacío si la consulta falla
+        error_message = status_response.get('Error', 'No se proporcionó información de error.')
+        raise Exception(error_message) #Paramos proceso si falla algún flujo
     else:
-        print("La operación fue abortada o no se completó exitosamente.")
-        return DataFrame(), status  # Retorna un DataFrame vacío si la consulta falla
+        raise Exception("La operación fue abortada o no se completó exitosamente.")
 
 
 def dataframe_to_s3(df, bucket="redshift-python-datalake", endpoint='data_lake', region_name='us-west-2', object_name='', credentials= None):
@@ -274,11 +272,10 @@ def load_s3_to_redshift(table, schema, s3_object_path, database='landing_zone', 
         print("La carga ha sido exitosa.")
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
-        error_message = status_response.get(
-            'Error', 'No se proporcionó información de error.')
-        print(f"Error al truncar la tabla: {error_message}")
+        error_message = status_response.get('Error', 'No se proporcionó información de error.')
+        raise Exception(error_message)
     else:
-        print("La operación fue abortada o no se completó exitosamente.")
+        raise Exception("La operación fue abortada o no se completó exitosamente.")
 
     return status
 
@@ -331,15 +328,15 @@ def execute_SP(store_procedure, schema, database="landing_zone", cluster_identif
         print(f"Current status: {status}")
     if status == 'FINISHED':
         print('Store Procedure ejecutado')
+        return status
+    
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
-        error_message = status_response.get(
-            'Error', 'No se proporcionó información de error.')
-        print(error_message)
+        error_message = status_response.get('Error', 'No se proporcionó información de error.')
+        raise Exception(error_message)
+    
     else:
-        print("La operación fue abortada o no se completó exitosamente.")
-
-    return status
+        raise Exception("La operación fue abortada o no se completó exitosamente.")
 
 
 def truncate_table(table, schema, database="landing_zone", cluster_identifier='redshift-data', db_user='admintreinta', region_name='us-west-2', credentials= None):
@@ -507,21 +504,20 @@ def sql_query(sql_query, database="landing_zone", cluster_identifier='redshift-d
 
     if status == 'FINISHED':
         print('Query ejecutada!')
+
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
-        error_message = status_response.get(
-            'Error', 'No se proporcionó información de error.')
-        print(f"Error ejecutando la query SQL: {error_message}")
+        error_message = status_response.get('Error', 'No se proporcionó información de error.')
+        raise Exception(error_message)
+
     else:
-        print("La operación fue abortada o no se completó exitosamente.")
+        raise Exception("La operación fue abortada o no se completó exitosamente.")
 
     return status
 
 
 def dataframe_to_redshift(df, table, schema, bucket="redshift-python-datalake", database='landing_zone', region_name='us-west-2', endpoint='data_lake', object_name=None, db_user='admintreinta', cluster_identifier='redshift-data', credentials= None):
     # Asegúrate de que todos los argumentos se pasen por nombre
-    s3_object_path = dataframe_to_s3(
-        df=df, bucket=bucket, endpoint=endpoint, region_name=region_name, object_name=object_name,credentials = credentials)
-    output = load_s3_to_redshift(table=table, schema=schema, s3_object_path=s3_object_path, database=database,
-                                 cluster_identifier=cluster_identifier, db_user=db_user, region_name=region_name, credentials = credentials)
+    s3_object_path = dataframe_to_s3(df=df, bucket=bucket, endpoint=endpoint, region_name=region_name, object_name=object_name,credentials = credentials)
+    output = load_s3_to_redshift(table=table, schema=schema, s3_object_path=s3_object_path, database=database, cluster_identifier=cluster_identifier, db_user=db_user, region_name=region_name, credentials = credentials)
     return output
