@@ -387,6 +387,7 @@ def truncate_table(table, schema, database="landing_zone", cluster_identifier='r
         #print(f"Current status: {status}")
 
     if status == 'FINISHED':
+        pass
         #print('Store Procedure ejecutado')
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
@@ -394,6 +395,7 @@ def truncate_table(table, schema, database="landing_zone", cluster_identifier='r
             'Error', 'No se proporcionó información de error.')
         #print(f"Error al truncar la tabla: {error_message}")
     else:
+        pass
         #print("La operación fue abortada o no se completó exitosamente.")
 
     return status
@@ -453,7 +455,9 @@ def drop_table(table, schema, database="landing_zone", cluster_identifier='redsh
         error_message = status_response.get(
             'Error', 'No se proporcionó información de error.')
         #print(f"Error al eliminar la tabla: {error_message}")
+        pass
     else:
+        pass
         #print("La operación fue abortada o no se completó exitosamente.")
 
     return status
