@@ -26,7 +26,7 @@ def assume_role(role_arn, session_name="RedshiftAccessSession"):
         )
         return assumed_role['Credentials']
     except Exception as e:
-        print(f"Error al asumir el rol: {e}")
+        #print(f"Error al asumir el rol: {e}")
         return None
 
 def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cluster_identifier='redshift-data', region_name='us-west-2', db_user='admintreinta', credentials= None):
@@ -73,10 +73,10 @@ def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cl
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(1)
+        time.sleep(0.33)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
-        print(f"Current status: {status}")
+        #print(f"Current status: {status}")
 
     if status == 'FINISHED':
         response = client.get_statement_result(Id=statement_id)
@@ -114,10 +114,10 @@ def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cl
         # Obtiene y muestra el mensaje de error
         error_message = status_response.get(
             'Error', 'No se proporcionó información de error.')
-        print(f"Error: {error_message}")
+        #print(f"Error: {error_message}")
         return DataFrame(), status  # Retorna un DataFrame vacío si la consulta falla
     else:
-        print("La operación fue abortada o no se completó exitosamente.")
+        #print("La operación fue abortada o no se completó exitosamente.")
         return DataFrame(), status  # Retorna un DataFrame vacío si la consulta falla
 
 
@@ -159,10 +159,10 @@ def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(1)
+        time.sleep(0.33)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
-        print(f"Current status: {status}")
+        #print(f"Current status: {status}")
 
     if status == 'FINISHED':
         response1 = client.get_statement_result(Id=statement_id)
@@ -248,7 +248,7 @@ def load_s3_to_redshift(table, schema, s3_object_path, database='landing_zone', 
         CSV;
     """
 
-    print(sql)
+    #print(sql)
     # Ejecuta el comando COPY
     response = client.execute_statement(
         ClusterIdentifier=cluster_identifier,
@@ -262,14 +262,14 @@ def load_s3_to_redshift(table, schema, s3_object_path, database='landing_zone', 
     # Espera a que la ejecución termine
     status = 'STARTED'
     while status in ['SUBMITTED', 'STARTED', 'PICKED']:
-        time.sleep(1)  # Espera 5 segundos antes de consultar nuevamente
+        time.sleep(0.33)  # Espera 5 segundos antes de consultar nuevamente
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
-        print(f"Estado actual: {status}")
+        #print(f"Estado actual: {status}")
 
     # Verifica el resultado de la ejecución
     if status == 'FINISHED':
-        print("La carga ha sido exitosa.")
+        #print("La carga ha sido exitosa.")
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
         error_message = status_response.get('Error', 'No se proporcionó información de error.')
@@ -322,12 +322,12 @@ def execute_SP(store_procedure, schema, database="landing_zone", cluster_identif
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(1)
+        time.sleep(0.33)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
-        print(f"Current status: {status}")
+        #print(f"Current status: {status}")
     if status == 'FINISHED':
-        print('Store Procedure ejecutado')
+        #print('Store Procedure ejecutado')
         return status
     
     elif status == 'FAILED':
@@ -381,20 +381,20 @@ def truncate_table(table, schema, database="landing_zone", cluster_identifier='r
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(1)
+        time.sleep(0.33)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
-        print(f"Current status: {status}")
+        #print(f"Current status: {status}")
 
     if status == 'FINISHED':
-        print('Store Procedure ejecutado')
+        #print('Store Procedure ejecutado')
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
         error_message = status_response.get(
             'Error', 'No se proporcionó información de error.')
-        print(f"Error al truncar la tabla: {error_message}")
+        #print(f"Error al truncar la tabla: {error_message}")
     else:
-        print("La operación fue abortada o no se completó exitosamente.")
+        #print("La operación fue abortada o no se completó exitosamente.")
 
     return status
 
@@ -441,20 +441,20 @@ def drop_table(table, schema, database="landing_zone", cluster_identifier='redsh
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(1)
+        time.sleep(0.33)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
-        print(f"Current status: {status}")
+        #print(f"Current status: {status}")
 
     if status == 'FINISHED':
-        print('Taabla eliminada!')
+        #print('Taabla eliminada!')
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
         error_message = status_response.get(
             'Error', 'No se proporcionó información de error.')
-        print(f"Error al eliminar la tabla: {error_message}")
+        #print(f"Error al eliminar la tabla: {error_message}")
     else:
-        print("La operación fue abortada o no se completó exitosamente.")
+        #print("La operación fue abortada o no se completó exitosamente.")
 
     return status
 
@@ -497,13 +497,13 @@ def sql_query(sql_query, database="landing_zone", cluster_identifier='redshift-d
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(1)
+        time.sleep(0.33)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
-        print(f"Current status: {status}")
+        #print(f"Current status: {status}")
 
     if status == 'FINISHED':
-        print('Query ejecutada!')
+        #print('Query ejecutada!')
 
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
