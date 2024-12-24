@@ -269,6 +269,7 @@ def load_s3_to_redshift(table, schema, s3_object_path, database='landing_zone', 
 
     # Verifica el resultado de la ejecución
     if status == 'FINISHED':
+        pass
         #print("La carga ha sido exitosa.")
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
@@ -450,6 +451,7 @@ def drop_table(table, schema, database="landing_zone", cluster_identifier='redsh
 
     if status == 'FINISHED':
         #print('Taabla eliminada!')
+        pass
     elif status == 'FAILED':
         # Obtiene y muestra el mensaje de error
         error_message = status_response.get(
@@ -507,6 +509,7 @@ def sql_query(sql_query, database="landing_zone", cluster_identifier='redshift-d
         #print(f"Current status: {status}")
 
     if status == 'FINISHED':
+        pass
         #print('Query ejecutada!')
 
     elif status == 'FAILED':
