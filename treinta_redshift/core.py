@@ -73,7 +73,7 @@ def table_to_dataframe(table, schema, database='landing_zone', NUM_ENTRIES=0, cl
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(5)
+        time.sleep(1)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
         print(f"Current status: {status}")
@@ -159,7 +159,7 @@ def query_to_dataframe(sql_query, cluster_identifier='redshift-data', database="
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(5)
+        time.sleep(1)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
         print(f"Current status: {status}")
@@ -262,7 +262,7 @@ def load_s3_to_redshift(table, schema, s3_object_path, database='landing_zone', 
     # Espera a que la ejecución termine
     status = 'STARTED'
     while status in ['SUBMITTED', 'STARTED', 'PICKED']:
-        time.sleep(5)  # Espera 5 segundos antes de consultar nuevamente
+        time.sleep(1)  # Espera 5 segundos antes de consultar nuevamente
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
         print(f"Estado actual: {status}")
@@ -322,7 +322,7 @@ def execute_SP(store_procedure, schema, database="landing_zone", cluster_identif
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(5)
+        time.sleep(1)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
         print(f"Current status: {status}")
@@ -381,7 +381,7 @@ def truncate_table(table, schema, database="landing_zone", cluster_identifier='r
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(5)
+        time.sleep(1)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
         print(f"Current status: {status}")
@@ -441,7 +441,7 @@ def drop_table(table, schema, database="landing_zone", cluster_identifier='redsh
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(5)
+        time.sleep(1)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
         print(f"Current status: {status}")
@@ -497,7 +497,7 @@ def sql_query(sql_query, database="landing_zone", cluster_identifier='redshift-d
     status = ''
     while status not in ['FINISHED', 'FAILED', 'ABORTED']:
         # Espera 5 segundos antes de verificar el estado nuevamente
-        time.sleep(5)
+        time.sleep(1)
         status_response = client.describe_statement(Id=statement_id)
         status = status_response['Status']
         print(f"Current status: {status}")
